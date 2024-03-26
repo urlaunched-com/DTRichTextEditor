@@ -517,16 +517,22 @@ typedef enum
 - (void)updateCursorAnimated:(BOOL)animated
 {
 	// no selection
+    /// URL Note: While we don't want cursor to be visible if there is no selection, BUT we need to set the selection rectangles.
+    /// Thus, when user perform long tap we can display selection for the nearest rect and show the menu items in place.
     if ((self.selectedTextRange == nil) || (self.isEditable && !self.isEditing) || !self.isFirstResponder)
 	{
-		// remove cursor
-		[_cursor removeFromSuperview];
-		
-		// remove selection
-		_selectionView.selectionRectangles = nil;
-		_selectionView.dragHandlesVisible = NO;
-		
-		return;
+        // remove cursor
+        [_cursor removeFromSuperview];
+        
+        // remove selection
+        _selectionView.selectionRectangles = nil;
+        _selectionView.dragHandlesVisible = NO;
+        
+        // update selectionRect so selection view with menu items will appear in place
+        NSArray *textSelectionRects = [self selectionRectsForRange:_selectedTextRange];
+        [_selectionView setSelectionRectangles:textSelectionRects animated:animated];
+        
+        return;
 	}
 	
 	// single cursor
