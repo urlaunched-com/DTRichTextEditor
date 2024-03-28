@@ -430,6 +430,24 @@ typedef enum
     _contextMenuVisible = YES;
     CGRect targetRect = [self visibleBoundsOfCurrentSelection];
     
+    // Add editor menu items and editor view delegate menu items
+    /// We need to add custom actions here as well, because after selection changed and we resign first responder menuItems are reset too.
+    NSMutableArray *menuItems = [[NSMutableArray alloc] initWithArray:self.editorMenuItems];
+    
+    if (_editorViewDelegateFlags.delegateMenuItems)
+    {
+        // Filter delegate's menu items to remove any that would interfere with our code
+        for (UIMenuItem *menuItem in self.editorViewDelegate.menuItems)
+        {
+            if (![self respondsToSelector:menuItem.action])
+            {
+                [menuItems addObject:menuItem];
+            }
+        }
+    }
+    
+    [[UIMenuController sharedMenuController] setMenuItems:menuItems];
+    
     // Present the menu
 	UIMenuController *menuController = [UIMenuController sharedMenuController];
 	
