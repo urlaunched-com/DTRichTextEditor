@@ -14,8 +14,42 @@
 @implementation DTRichTextEditorView (Ranges)
 
 #pragma mark - Working with Ranges
+- (BOOL)isImageAttachmentAtPosition:(UITextPosition *)position {
+    /**
+     URL: Here we should check all the possible location for the image, so we don't return selection rect or fire the cursor when trying to select an image using long press or double tap.
+     */
+    
+    // Check the position one character ahead
+    UITextPosition *plusOnePosition = [self positionFromPosition:position offset:1];
+    UITextRange *forwardRange = [self textRangeFromPosition:position toPosition:plusOnePosition];
+    NSAttributedString *forwardCharacterString = [self attributedSubstringForRange:forwardRange];
+
+    if ([forwardCharacterString length] &&
+        [[forwardCharacterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName]) {
+        return YES;
+    }
+
+    // Check the position one character behind
+    UITextPosition *minusOnePosition = [self positionFromPosition:position offset:-1];
+    UITextRange *backwardRange = [self textRangeFromPosition:minusOnePosition toPosition:position];
+    NSAttributedString *backwardCharacterString = [self attributedSubstringForRange:backwardRange];
+
+    if ([backwardCharacterString length] &&
+        [[backwardCharacterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName]) {
+        return YES;
+    }
+
+    return NO;
+}
+
 - (UITextRange *)textRangeOfWordAtPosition:(UITextPosition *)position
 {
+    
+    // URL: Check if the position is an image attachment and abort if it is
+    if ([self isImageAttachmentAtPosition:position]) {
+        return nil;
+    }
+    
 	DTTextRange *forRange = (id)[[self tokenizer] rangeEnclosingPosition:position withGranularity:UITextGranularityWord inDirection:UITextStorageDirectionForward];
 	DTTextRange *backRange = (id)[[self tokenizer] rangeEnclosingPosition:position withGranularity:UITextGranularityWord inDirection:UITextStorageDirectionBackward];
 	
@@ -33,33 +67,10 @@
 		return backRange;
 	}
 	
-	// treat image as word, left side of image selects it
-	UITextPosition *plusOnePosition = [self positionFromPosition:position offset:1];
-	UITextRange *imageRange = [self textRangeFromPosition:position toPosition:plusOnePosition];
-	
-	NSAttributedString *characterString = [self attributedSubstringForRange:imageRange];
-	
-    // only check for attachment attribute if the string is not empty
-    if ([characterString length])
-    {
-        if ([[characterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName])
-        {
-            return imageRange;
-        }
-    }
-	
 	// we did not get a forward or backward range, like Word!|
 	DTTextPosition *previousPosition = (id)([self.tokenizer positionFromPosition:position
                                                                       toBoundary:UITextGranularityCharacter
                                                                      inDirection:UITextStorageDirectionBackward]);
-	
-	// treat image as word, right side of image selects it
-	characterString = [self.attributedTextContentView.layoutFrame.attributedStringFragment attributedSubstringFromRange:NSMakeRange(previousPosition.location, 1)];
-	
-	if ([[characterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName])
-	{
-		return [DTTextRange textRangeFromStart:previousPosition toEnd:[previousPosition textPositionWithOffset:1]];
-	}
 	
 	forRange = (id)[[self tokenizer] rangeEnclosingPosition:previousPosition withGranularity:UITextGranularityWord inDirection:UITextStorageDirectionForward];
 	backRange = (id)[[self tokenizer] rangeEnclosingPosition:previousPosition withGranularity:UITextGranularityWord inDirection:UITextStorageDirectionBackward];
