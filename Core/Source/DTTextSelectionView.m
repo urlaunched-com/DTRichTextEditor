@@ -498,16 +498,35 @@
 
 - (void)setSelectionRectangles:(NSArray *)selectionRectangles animated:(BOOL)animated
 {
-	if (_selectionRectangles != selectionRectangles)
+    /**
+     URL: Filter rectangles that are too thin, meaning that they represent no symbol at all.
+     */
+    NSMutableArray *filteredRectangles = [NSMutableArray array];
+    for (id obj in selectionRectangles) {
+        CGRect rect;
+        if ([obj isKindOfClass:[NSValue class]]) {
+            rect = [obj CGRectValue];
+        } else if ([obj isKindOfClass:[DTTextSelectionRectDerived class]]) {
+            rect = [(DTTextSelectionRectDerived *)obj rect];
+        } else {
+            continue;
+        }
+        
+        // Adjust the threshold to filter out thin rectangles
+        if (rect.size.width > 2.0) {
+            [filteredRectangles addObject:obj];
+        }
+    }
+    
+	if (_selectionRectangles != filteredRectangles)
 	{
 		// no animation if the number of rectanbles does not match previous one
-		if ([_selectionRectangles count] != [selectionRectangles count])
+		if ([_selectionRectangles count] != [filteredRectangles count])
 		{
 			animated = NO;
 		}
 		
-		_selectionRectangles = selectionRectangles;
-		
+		_selectionRectangles = filteredRectangles;		
 		
 		if (animated)
 		{

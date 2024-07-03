@@ -626,9 +626,12 @@ typedef enum
 // in edit mode or if not firstResponder we select words
 - (void)selectWordAtPositionClosestToLocation:(CGPoint)location
 {
-	UITextPosition *position = (id)[self closestPositionToPoint:location];
-	UITextRange *wordRange = [self textRangeOfWordAtPosition:position];
-	self.selectedTextRange = wordRange;
+    UITextPosition *position = (id)[self closestPositionToPoint:location];
+    UITextRange *wordRange = [self textRangeOfWordAtPosition:position];
+
+    if (wordRange) {
+        self.selectedTextRange = wordRange;
+    }
 }
 
 
@@ -1334,7 +1337,17 @@ typedef enum
             // wrap long press/drag handles in calls to the input delegate because the intermediate selection changes are not important to editing
             [self _inputDelegateSelectionDidChange];
             
-			[self presentLoupeWithTouchPoint:touchPoint];
+            
+            /**
+             URL: Process with long press only if wordRange is not nil meaning that we are NOT working with images.
+             */
+            UITextPosition *position = (id)[self closestPositionToPoint:touchPoint];
+            UITextRange *wordRange = [self textRangeOfWordAtPosition:position];
+            
+            if (wordRange) {
+                [self presentLoupeWithTouchPoint:touchPoint];
+            }
+            
 			_cursor.state = DTCursorStateStatic;
             
             // become first responder to bring up editing and show the cursor
