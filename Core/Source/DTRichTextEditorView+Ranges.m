@@ -24,8 +24,7 @@
     UITextRange *forwardRange = [self textRangeFromPosition:position toPosition:plusOnePosition];
     NSAttributedString *forwardCharacterString = [self attributedSubstringForRange:forwardRange];
 
-    if ([forwardCharacterString length] &&
-        [[forwardCharacterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName]) {
+    if ([self isImageAttachmentInAttributedString:forwardCharacterString]) {
         return YES;
     }
 
@@ -34,11 +33,23 @@
     UITextRange *backwardRange = [self textRangeFromPosition:minusOnePosition toPosition:position];
     NSAttributedString *backwardCharacterString = [self attributedSubstringForRange:backwardRange];
 
-    if ([backwardCharacterString length] &&
-        [[backwardCharacterString attributesAtIndex:0 effectiveRange:NULL] objectForKey:NSAttachmentAttributeName]) {
+    if ([self isImageAttachmentInAttributedString:backwardCharacterString]) {
         return YES;
     }
 
+    return NO;
+}
+
+- (BOOL)isImageAttachmentInAttributedString:(NSAttributedString *)attributedString {
+    if ([attributedString length] > 0) {
+        NSDictionary *attributes = [attributedString attributesAtIndex:0 effectiveRange:NULL];
+        NSTextAttachment *attachment = attributes[NSAttachmentAttributeName];
+        
+        if ([attachment isKindOfClass:[DTImageTextAttachment class]]) {
+            return YES;
+        }
+    }
+    
     return NO;
 }
 
