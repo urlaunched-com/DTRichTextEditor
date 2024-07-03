@@ -10,6 +10,7 @@
 
 #import <DTCoreText/DTAttributedTextContentView.h>
 #import <DTCoreText/NSString+Paragraphs.h>
+#import <DTCoreText/DTCoreText.h>
 
 @implementation DTRichTextEditorView (Ranges)
 
