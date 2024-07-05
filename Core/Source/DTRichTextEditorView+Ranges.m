@@ -150,23 +150,32 @@
 
 - (UITextRange *)textRangeOfParagraphsContainingRange:(UITextRange *)range
 {
-	NSRange myRange = [(DTTextRange *)range NSRangeValue];
-    myRange.length ++;
-	
-	// get range containing all selected paragraphs
-	NSAttributedString *attributedString = self.attributedText;
-	
-	NSString *string = [attributedString string];
-	
-	NSUInteger begIndex;
-	NSUInteger endIndex;
-	
-	[string rangeOfParagraphsContainingRange:myRange parBegIndex:&begIndex parEndIndex:&endIndex];
-	myRange = NSMakeRange(begIndex, endIndex - begIndex); // now extended to full paragraphs
-	
-	DTTextRange *retRange = [DTTextRange rangeWithNSRange:myRange];
+    NSRange myRange = [(DTTextRange *)range NSRangeValue];
+    myRange.length++;
     
-	return retRange;
+    // URL: Check if the position is an image attachment and abort if it is
+    /// Iterate through the range to check for image attachments
+    for (NSUInteger i = myRange.location; i < NSMaxRange(myRange); i++) {
+        UITextPosition *position = [self positionFromPosition:self.beginningOfDocument offset:i];
+        if ([self isImageAttachmentAtPosition:position]) {
+            return nil;
+        }
+    }
+    
+    // get range containing all selected paragraphs
+    NSAttributedString *attributedString = self.attributedText;
+    
+    NSString *string = [attributedString string];
+    
+    NSUInteger begIndex;
+    NSUInteger endIndex;
+    
+    [string rangeOfParagraphsContainingRange:myRange parBegIndex:&begIndex parEndIndex:&endIndex];
+    myRange = NSMakeRange(begIndex, endIndex - begIndex); // now extended to full paragraphs
+    
+    DTTextRange *retRange = [DTTextRange rangeWithNSRange:myRange];
+    
+    return retRange;
 }
 
 @end
