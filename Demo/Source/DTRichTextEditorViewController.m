@@ -412,6 +412,25 @@ NSString *DTTestStateDataKey = @"DTTestStateDataKey";
 - (void)editorViewDidChangeSelection:(DTRichTextEditorView *)editorView
 {
     NSLog(@"editorViewDidChangeSelection:");
+    BOOL isTextSelected = ![editorView.selectedTextRange isEmpty];
+    
+    // Fire `editorViewDidBeginSelection` if text selection begins
+    if (isTextSelected && !self.isCurrentlySelectingText) {
+        self.isCurrentlySelectingText = YES;
+        
+        if (_editorViewDelegateFlags.delegateDidBeginSelection) {
+            [self.editorViewDelegate editorViewDidBeginSelection:self];
+        }
+    }
+    
+    // Fire `editorViewDidEndSelection` if text selection ends
+    if (!isTextSelected && self.isCurrentlySelectingText) {
+        self.isCurrentlySelectingText = NO;
+        
+        if (_editorViewDelegateFlags.delegateDidEndSelection) {
+            [self.editorViewDelegate editorViewDidEndSelection:self];
+        }
+    }
     
     if( self.formatViewController && [richEditor inputView] == self.formatViewController.view ){
         self.formatViewController.fontDescriptor = [richEditor fontDescriptorForRange:richEditor.selectedTextRange];

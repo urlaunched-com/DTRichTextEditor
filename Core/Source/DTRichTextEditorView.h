@@ -210,6 +210,8 @@ extern NSString * const DTRichTextEditorTextDidEndEditingNotification;
  */
 @property (nonatomic, copy) NSAttributedString *attributedText;
 
+@property (nonatomic, assign) BOOL isCurrentlySelectingText;
+
 @end
 
 

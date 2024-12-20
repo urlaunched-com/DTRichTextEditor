@@ -1446,10 +1446,6 @@ typedef enum
 			[self presentLoupeWithTouchPoint:touchPoint];
 			
 			[self hideContextMenu];
-        
-            if (_editorViewDelegateFlags.delegateDidBeginSelection) {
-                [self.editorViewDelegate editorViewDidBeginSelection:self];
-            }
 			
 			break;
 		}
@@ -1481,10 +1477,6 @@ typedef enum
                     [self extendSelectionToIncludeWordInDirection:UITextStorageDirectionForward];
                 }
             }
-        
-            if (_editorViewDelegateFlags.delegateDidEndSelection) {
-                [self.editorViewDelegate editorViewDidEndSelection:self];
-            }
 		}
             
 		case UIGestureRecognizerStateCancelled:
@@ -1496,10 +1488,6 @@ typedef enum
 			
             // Notify that long press/drag handles has concluded and selection may be changed
             [self _inputDelegateSelectionDidChange];
-        
-            if (_editorViewDelegateFlags.delegateDidEndSelection) {
-                [self.editorViewDelegate editorViewDidEndSelection:self];
-            }
 			
 			break;
 		}
