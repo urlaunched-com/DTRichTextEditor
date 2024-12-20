@@ -3213,20 +3213,18 @@ typedef enum
     
     // Fire `editorViewDidBeginSelection` if text selection begins
     if (isTextSelected && !self.isCurrentlySelectingText) {
+        NSLog(@"DEBUG: Text selected");
         self.isCurrentlySelectingText = YES;
         
-        if (_editorViewDelegateFlags.delegateDidBeginSelection) {
-            [self.editorViewDelegate editorViewDidBeginSelection:self];
-        }
+        [self.editorViewDelegate editorViewDidBeginSelection:self];
     }
     
     // Fire `editorViewDidEndSelection` if text selection ends
     if (!isTextSelected && self.isCurrentlySelectingText) {
+        NSLog(@"DEBUG: Text deselected");
         self.isCurrentlySelectingText = NO;
         
-        if (_editorViewDelegateFlags.delegateDidEndSelection) {
-            [self.editorViewDelegate editorViewDidEndSelection:self];
-        }
+        [self.editorViewDelegate editorViewDidEndSelection:self];
     }
     
     // only notify on user input while editing
