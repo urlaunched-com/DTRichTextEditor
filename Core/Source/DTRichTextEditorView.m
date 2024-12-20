@@ -3209,7 +3209,7 @@ typedef enum
 
 - (void)_editorViewDelegateDidChangeSelection
 {
-    BOOL isTextSelected = _selectedTextRange.isEmpty;
+    BOOL isTextSelected = ![_selectedTextRange isEmpty];
     
     // Fire `editorViewDidBeginSelection` if text selection begins
     if (isTextSelected && !self.isCurrentlySelectingText) {
