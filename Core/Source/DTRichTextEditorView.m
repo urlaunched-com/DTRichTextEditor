@@ -3209,6 +3209,26 @@ typedef enum
 
 - (void)_editorViewDelegateDidChangeSelection
 {
+    BOOL isTextSelected = _selectedTextRange.isEmpty;
+    
+    // Fire `editorViewDidBeginSelection` if text selection begins
+    if (isTextSelected && !self.isCurrentlySelectingText) {
+        self.isCurrentlySelectingText = YES;
+        
+        if (_editorViewDelegateFlags.delegateDidBeginSelection) {
+            [self.editorViewDelegate editorViewDidBeginSelection:self];
+        }
+    }
+    
+    // Fire `editorViewDidEndSelection` if text selection ends
+    if (!isTextSelected && self.isCurrentlySelectingText) {
+        self.isCurrentlySelectingText = NO;
+        
+        if (_editorViewDelegateFlags.delegateDidEndSelection) {
+            [self.editorViewDelegate editorViewDidEndSelection:self];
+        }
+    }
+    
     // only notify on user input while editing
     if (self.isEditing && _editorViewDelegateFlags.delegateDidChangeSelection)
     {
