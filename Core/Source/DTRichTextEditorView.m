@@ -1234,6 +1234,7 @@ typedef enum
 	
 	// Select a word closest to the touchPoint
 	[self.inputDelegate selectionWillChange:self];
+    [self.editorViewDelegate editorViewDidBeginSelection:self];
 	
 	UITextPosition *position = (id)[self closestPositionToPoint:touchPoint];
 	UITextRange *wordRange = [self textRangeOfWordAtPosition:position];
@@ -1305,6 +1306,7 @@ typedef enum
 	[self hideContextMenu];
 	
 	self.selectedTextRange = textRange;
+    [self.editorViewDelegate editorViewDidBeginSelection:self];
 	
 	[self showContextMenuFromSelection];
 	
@@ -1339,6 +1341,7 @@ typedef enum
             
             // wrap long press/drag handles in calls to the input delegate because the intermediate selection changes are not important to editing
             [self _inputDelegateSelectionDidChange];
+            [self.editorViewDelegate editorViewDidBeginSelection:self];
             
             
             /**
@@ -1567,7 +1570,6 @@ typedef enum
     _editorViewDelegateFlags.delegateMenuItems = [editorViewDelegate respondsToSelector:@selector(menuItems)];
     _editorViewDelegateFlags.delegateCanPerformActionsWithSender = [editorViewDelegate respondsToSelector:@selector(editorView:canPerformAction:withSender:)];
     _editorViewDelegateFlags.delegateDidBeginSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidBeginSelection:)];
-    _editorViewDelegateFlags.delegateDidEndSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidEndSelection:)];
 }
 
 #pragma mark - Editing State
@@ -3209,24 +3211,6 @@ typedef enum
 
 - (void)_editorViewDelegateDidChangeSelection
 {
-    BOOL isTextSelected = ![_selectedTextRange isEmpty];
-    
-    // Fire `editorViewDidBeginSelection` if text selection begins
-    if (isTextSelected && !self.isCurrentlySelectingText) {
-        NSLog(@"DEBUG: Text selected");
-        self.isCurrentlySelectingText = YES;
-        
-        [self.editorViewDelegate editorViewDidBeginSelection:self];
-    }
-    
-    // Fire `editorViewDidEndSelection` if text selection ends
-    if (!isTextSelected && self.isCurrentlySelectingText) {
-        NSLog(@"DEBUG: Text deselected");
-        self.isCurrentlySelectingText = NO;
-        
-        [self.editorViewDelegate editorViewDidEndSelection:self];
-    }
-    
     // only notify on user input while editing
     if (self.isEditing && _editorViewDelegateFlags.delegateDidChangeSelection)
     {

@@ -210,8 +210,6 @@ extern NSString * const DTRichTextEditorTextDidEndEditingNotification;
  */
 @property (nonatomic, copy) NSAttributedString *attributedText;
 
-@property (nonatomic, assign) BOOL isCurrentlySelectingText;
-
 @end
 
 
@@ -325,6 +323,5 @@ extern NSString * const DTRichTextEditorTextDidEndEditingNotification;
 - (BOOL)editorView:(DTRichTextEditorView *)editorView canPerformAction:(SEL)action withSender:(id)sender;
 
 - (void)editorViewDidBeginSelection:(DTRichTextEditorView *)editorView;
-- (void)editorViewDidEndSelection:(DTRichTextEditorView *)editorView;
 
 @end
