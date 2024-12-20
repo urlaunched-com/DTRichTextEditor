@@ -194,6 +194,9 @@ typedef enum
         // Editing Menu Items
         unsigned int delegateMenuItems:1;
         unsigned int delegateCanPerformActionsWithSender:1;
+        
+        unsigned int delegateDidBeginSelection:1;
+        unsigned int delegateDidEndSelection:1; 
     } _editorViewDelegateFlags;
     
     // Use to disallow canPerformAction: to proceed up the responder chain (-nextResponder)
@@ -1443,6 +1446,10 @@ typedef enum
 			[self presentLoupeWithTouchPoint:touchPoint];
 			
 			[self hideContextMenu];
+        
+            if (_editorViewDelegateFlags.delegateDidBeginSelection) {
+                [self.editorViewDelegate editorViewDidBeginSelection:self];
+            }
 			
 			break;
 		}
@@ -1474,6 +1481,10 @@ typedef enum
                     [self extendSelectionToIncludeWordInDirection:UITextStorageDirectionForward];
                 }
             }
+        
+            if (_editorViewDelegateFlags.delegateDidEndSelection) {
+                [self.editorViewDelegate editorViewDidEndSelection:self];
+            }
 		}
             
 		case UIGestureRecognizerStateCancelled:
@@ -1485,6 +1496,10 @@ typedef enum
 			
             // Notify that long press/drag handles has concluded and selection may be changed
             [self _inputDelegateSelectionDidChange];
+        
+            if (_editorViewDelegateFlags.delegateDidEndSelection) {
+                [self.editorViewDelegate editorViewDidEndSelection:self];
+            }
 			
 			break;
 		}
@@ -1563,6 +1578,8 @@ typedef enum
     _editorViewDelegateFlags.delegateDidChangeSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidChangeSelection:)];
     _editorViewDelegateFlags.delegateMenuItems = [editorViewDelegate respondsToSelector:@selector(menuItems)];
     _editorViewDelegateFlags.delegateCanPerformActionsWithSender = [editorViewDelegate respondsToSelector:@selector(editorView:canPerformAction:withSender:)];
+    _editorViewDelegateFlags.delegateDidBeginSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidBeginSelection:)];
+    _editorViewDelegateFlags.delegateDidEndSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidEndSelection:)];
 }
 
 #pragma mark - Editing State

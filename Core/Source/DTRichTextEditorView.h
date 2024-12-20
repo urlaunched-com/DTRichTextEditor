@@ -322,4 +322,7 @@ extern NSString * const DTRichTextEditorTextDidEndEditingNotification;
  */
 - (BOOL)editorView:(DTRichTextEditorView *)editorView canPerformAction:(SEL)action withSender:(id)sender;
 
+- (void)editorViewDidBeginSelection:(DTRichTextEditorView *)editorView;
+- (void)editorViewDidEndSelection:(DTRichTextEditorView *)editorView;
+
 @end
