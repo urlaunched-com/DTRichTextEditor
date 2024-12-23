@@ -1234,6 +1234,7 @@ typedef enum
 	
 	// Select a word closest to the touchPoint
 	[self.inputDelegate selectionWillChange:self];
+    [self.editorViewDelegate editorViewDidBeginSelection:self];
 	
 	UITextPosition *position = (id)[self closestPositionToPoint:touchPoint];
 	UITextRange *wordRange = [self textRangeOfWordAtPosition:position];
@@ -1305,6 +1306,7 @@ typedef enum
 	[self hideContextMenu];
 	
 	self.selectedTextRange = textRange;
+    [self.editorViewDelegate editorViewDidBeginSelection:self];
 	
 	[self showContextMenuFromSelection];
 	
@@ -1339,6 +1341,7 @@ typedef enum
             
             // wrap long press/drag handles in calls to the input delegate because the intermediate selection changes are not important to editing
             [self _inputDelegateSelectionDidChange];
+            [self.editorViewDelegate editorViewDidBeginSelection:self];
             
             
             /**
@@ -1446,10 +1449,6 @@ typedef enum
 			[self presentLoupeWithTouchPoint:touchPoint];
 			
 			[self hideContextMenu];
-        
-            if (_editorViewDelegateFlags.delegateDidBeginSelection) {
-                [self.editorViewDelegate editorViewDidBeginSelection:self];
-            }
 			
 			break;
 		}
@@ -1481,10 +1480,6 @@ typedef enum
                     [self extendSelectionToIncludeWordInDirection:UITextStorageDirectionForward];
                 }
             }
-        
-            if (_editorViewDelegateFlags.delegateDidEndSelection) {
-                [self.editorViewDelegate editorViewDidEndSelection:self];
-            }
 		}
             
 		case UIGestureRecognizerStateCancelled:
@@ -1496,10 +1491,6 @@ typedef enum
 			
             // Notify that long press/drag handles has concluded and selection may be changed
             [self _inputDelegateSelectionDidChange];
-        
-            if (_editorViewDelegateFlags.delegateDidEndSelection) {
-                [self.editorViewDelegate editorViewDidEndSelection:self];
-            }
 			
 			break;
 		}
@@ -1579,7 +1570,6 @@ typedef enum
     _editorViewDelegateFlags.delegateMenuItems = [editorViewDelegate respondsToSelector:@selector(menuItems)];
     _editorViewDelegateFlags.delegateCanPerformActionsWithSender = [editorViewDelegate respondsToSelector:@selector(editorView:canPerformAction:withSender:)];
     _editorViewDelegateFlags.delegateDidBeginSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidBeginSelection:)];
-    _editorViewDelegateFlags.delegateDidEndSelection = [editorViewDelegate respondsToSelector:@selector(editorViewDidEndSelection:)];
 }
 
 #pragma mark - Editing State
