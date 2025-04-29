@@ -4,6 +4,7 @@
 [submodule "Core/Externals/DTCoreText"]
 	path = Core/Externals/DTCoreText
 	url = https://github.com/urlaunched-com/DTCoreText.git
+	branch = fix/underline
 [submodule "Core/Externals/DTWebArchive"]
 	path = Core/Externals/DTWebArchive
 	url = https://github.com/Cocoanetics/DTWebArchive.git
